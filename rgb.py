@@ -10,6 +10,7 @@ if machine() == 'x86_64' or machine() == 'i386':
 else:
 	pi = pigpio.pi()
 
+
 app = Flask(__name__)
 
 # Explorer HAT uses GPIO 27 = red, 4 = blue, 5 = green
@@ -30,6 +31,8 @@ pins = {
 	'blue':  11
 }
 
+for pin in pins.values():
+	pi.set_mode(pin, pigpio.OUTPUT)
 
 # for color in leds.keys():
 #	GPIO.setup(leds[color], GPIO.OUT)
