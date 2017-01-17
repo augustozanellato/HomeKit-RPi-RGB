@@ -74,7 +74,7 @@ def setBrightness(b):
 @app.route('/led/get/brightness')
 def getBrightness():
 	global leds
-	return leds['brightness']
+	return str(leds['brightness'])
 
 
 @app.route('/led/get/status')
