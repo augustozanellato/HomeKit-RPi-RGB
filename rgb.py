@@ -1,23 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 from flask import Flask
 import pigpio
 from struct import unpack, pack
 from platform import machine
 
-if machine() == 'x86_64' or machine() == 'i386':
-	pi = pigpio.pi('192.168.1.21')
-else:
-	pi = pigpio.pi()
-
+pi = pigpio.pi()
 
 app = Flask(__name__)
 
-# Explorer HAT uses GPIO 27 = red, 4 = blue, 5 = green
-# Pibrella uses GPIO 27 = red, 17 = yellow, 4 = green
-
-
-# Map of LED names and associated GPIO pins
+# Array used for storing led values
 leds = {
 	'red':        0,
 	'blue':       0,
@@ -25,6 +17,7 @@ leds = {
 	'brightness': 0,
 	'status':     False
 }
+# Led pin mapping
 pins = {
 	'red':   10,
 	'green': 9,
@@ -33,9 +26,6 @@ pins = {
 
 for pin in pins.values():
 	pi.set_mode(pin, pigpio.OUTPUT)
-
-# for color in leds.keys():
-#	GPIO.setup(leds[color], GPIO.OUT)
 
 def ledUpdate():
 	global pins
