@@ -8,6 +8,8 @@ pi = pigpio.pi()
 
 app = Flask(__name__)
 
+app.config['CACHE_TYPE'] = "null"
+
 # Array used for storing led values
 leds = {
 	'red':        0,
@@ -111,6 +113,14 @@ def ui():
 @app.route('/jscolor.js')
 def js():
 	return app.send_static_file('jscolor.js')
+
+
+@app.after_request
+def add_header(r):
+	r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
+	r.headers["Pragma"] = "no-cache"
+	r.headers['Expires'] = '0'
+	return r
 
 #app.add_url_rule("/", "index", lambda: 'Hello World!')
 
