@@ -39,16 +39,6 @@ def ledUpdate():
 		pi.set_PWM_dutycycle(pins['green'], 0)
 		pi.set_PWM_dutycycle(pins['blue'], 0)
 
-
-@app.route("/led/webset/colorset.html")
-def setColorWeb():
-	try:
-		leds['red'], leds['green'], leds['blue'] = unpack('BBB', str(request.args.get('color')).decode('hex'))
-		ledUpdate()
-		return 'Successfully set color: {}'.format(request.args.get('color'))
-	except:
-		return 'Invalid color: {}'.format(request.args.get('color'))
-
 @app.route("/led/set/<color>")
 def setColor(color):
 	try:
