@@ -3,7 +3,6 @@
 from flask import Flask, request
 import pigpio
 from struct import unpack, pack
-from platform import machine
 
 pi = pigpio.pi()
 
@@ -43,12 +42,12 @@ def ledUpdate():
 
 @app.route("/led/webset/colorset.html")
 def setColorWeb():
-        try:
-                leds['red'], leds['green'], leds['blue'] = unpack('BBB', str(request.args.get('color')).decode('hex'))
-                ledUpdate()
-                return 'Successfully set color: {}'.format(request.args.get('color'))
-        except:
-                return 'Invalid color: {}'.format(request.args.get('color'))
+	try:
+		leds['red'], leds['green'], leds['blue'] = unpack('BBB', str(request.args.get('color')).decode('hex'))
+		ledUpdate()
+		return 'Successfully set color: {}'.format(request.args.get('color'))
+	except:
+		return 'Invalid color: {}'.format(request.args.get('color'))
 
 @app.route("/led/set/<color>")
 def setColor(color):
@@ -108,8 +107,12 @@ def index():
 
 @app.route('/newui.html')
 def ui():
-        
-        return app.send_static_file('newui.html')
+	try:
+		leds['red'], leds['green'], leds['blue'] = unpack('BBB', str(request.args.get('color')).decode('hex'))
+		ledUpdate()
+	except:
+		pass
+	return app.send_static_file('newui.html')
 
 @app.route('/jscolor.js')
 def js():
