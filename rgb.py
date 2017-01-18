@@ -101,6 +101,10 @@ def index():
 def ui():
 	try:
 		leds['red'], leds['green'], leds['blue'] = unpack('BBB', str(request.args.get('color')).decode('hex'))
+		ledUpdate()
+	except:
+		pass
+	try:
 		if request.args.get('status') == 'on':
 			leds['status'] = True
 		elif request.args.get('status') == 'off':
