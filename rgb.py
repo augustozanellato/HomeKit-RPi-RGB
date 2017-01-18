@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-from flask import Flask
+from flask import Flask, request
 import pigpio
 from struct import unpack, pack
 from platform import machine
@@ -41,6 +41,15 @@ def ledUpdate():
 		pi.set_PWM_dutycycle(pins['blue'], 0)
 
 
+@app.route("/led/webset/colorset.html")
+def setColorWeb():
+        try:
+                leds['red'], leds['green'], leds['blue'] = unpack('BBB', str(request.args.get('color')).decode('hex'))
+                ledUpdate()
+                return 'Successfully set color: {}'.format(request.args.get('color'))
+        except:
+                return 'Invalid color: {}'.format(request.args.get('color'))
+
 @app.route("/led/set/<color>")
 def setColor(color):
 	try:
@@ -49,7 +58,6 @@ def setColor(color):
 		return 'Successfully set color: {}'.format(color)
 	except:
 		return 'Invalid color: {}'.format(color)
-
 
 @app.route("/led/get/color")
 def getColor():
@@ -94,7 +102,20 @@ def ledOn():
 	ledUpdate()
 	return 'on'
 
-app.add_url_rule("/", "index", lambda: 'Hello World!')
+@app.route('/')
+def index():
+	return app.send_static_file('newui.html')
+
+@app.route('/newui.html')
+def ui():
+        
+        return app.send_static_file('newui.html')
+
+@app.route('/jscolor.js')
+def js():
+	return app.send_static_file('jscolor.js')
+
+#app.add_url_rule("/", "index", lambda: 'Hello World!')
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0')
