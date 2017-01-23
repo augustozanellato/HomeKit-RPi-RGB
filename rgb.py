@@ -57,8 +57,8 @@ def getColor():
 
 
 @app.route("/led/set/b/<brightness>")
-def setBrightness(b):
-	leds['brightness'] = b
+def setBrightness(brightness):
+	leds['brightness'] = brightness
 	ledUpdate()
 	return "Successfully set brightness: {}".format(leds['brightness'])
 
@@ -73,9 +73,9 @@ def getBrightness():
 def getStatus():
 	global leds
 	if leds['status']:
-		return 'on'
+		return '1'
 	else:
-		return 'off'
+		return '0'
 
 
 @app.route('/led/off')
