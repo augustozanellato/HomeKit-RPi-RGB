@@ -66,7 +66,7 @@ def setBrightness(brightness):
 @app.route('/led/get/brightness')
 def getBrightness():
 	global leds
-	return str(leds['brightness'])
+	return int(max(leds['red'], leds['green'], leds['blue']) / 255.0 * 100.0)
 
 
 @app.route('/led/get/status')
