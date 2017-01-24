@@ -1,97 +1,45 @@
 #!/usr/bin/env python2
 
 from flask import Flask, request
-import pigpio
-from struct import unpack, pack
-
-pi = pigpio.pi()
+import ledutils
 
 app = Flask(__name__)
 
 app.config['CACHE_TYPE'] = "null"
 
-# Array used for storing led values
-leds = {
-	'red':        0,
-	'blue':       0,
-	'green':      0,
-	'brightness': 0,
-	'status':     False
-}
-# Led pin mapping
-pins = {
-	'red':   10,
-	'green': 9,
-	'blue':  11
-}
-
-for pin in pins.values():
-	pi.set_mode(pin, pigpio.OUTPUT)
-
-def ledUpdate():
-	global pins
-	global leds
-	global pi
-	if leds['status']:
-		pi.set_PWM_dutycycle(pins['red'], leds['red'])
-		pi.set_PWM_dutycycle(pins['green'], leds['green'])
-		pi.set_PWM_dutycycle(pins['blue'], leds['blue'])
-	else:
-		pi.set_PWM_dutycycle(pins['red'], 0)
-		pi.set_PWM_dutycycle(pins['green'], 0)
-		pi.set_PWM_dutycycle(pins['blue'], 0)
+ledstrip = ledutils.RGBStrip(10, 9, 11)
 
 @app.route("/led/set/<color>")
 def setColor(color):
 	try:
-		leds['red'], leds['green'], leds['blue'] = unpack('BBB', color.decode('hex'))
-		ledUpdate()
+		ledstrip.setHEX(color)
 		return 'Successfully set color: {}'.format(color)
 	except:
 		return 'Invalid color: {}'.format(color)
 
 @app.route("/led/get/color")
 def getColor():
-	global leds
-	return pack('BBB', *(leds['red'], leds['green'], leds['blue'])).encode('hex')
-
-
-@app.route("/led/set/b/<brightness>")
-def setBrightness(brightness):
-	leds['brightness'] = brightness
-	ledUpdate()
-	return "Successfully set brightness: {}".format(leds['brightness'])
-
+	return ledstrip.getColor()
 
 @app.route('/led/get/brightness')
 def getBrightness():
-	global leds
-	return str(int(max(leds['red'], leds['green'], leds['blue']) / 255.0 * 100.0))
-
+	return ledstrip.getBrightness()
 
 @app.route('/led/get/status')
 def getStatus():
-	global leds
-	if leds['status']:
-		return '1'
-	else:
-		return '0'
-
+	return ledstrip.getStatus()
 
 @app.route('/led/off')
 def ledOff():
-	global leds
-	leds['status'] = False
-	ledUpdate()
-	return 'off'
-
+	ledstrip.status = False
+	ledstrip.update()
+	return getStatus()
 
 @app.route('/led/on')
 def ledOn():
-	global leds
-	leds['status'] = True
-	ledUpdate()
-	return 'on'
+	ledstrip.status = True
+	ledstrip.update()
+	return getStatus()
 
 @app.route('/')
 def index():
@@ -100,16 +48,15 @@ def index():
 @app.route('/newui.html')
 def ui():
 	try:
-		leds['red'], leds['green'], leds['blue'] = unpack('BBB', str(request.args.get('color')).decode('hex'))
-		ledUpdate()
+		ledstrip.setHEX(str(request.args.get('color')))
 	except:
 		pass
 	try:
 		if request.args.get('status') == 'on':
-			leds['status'] = True
+			ledstrip.status = True
 		elif request.args.get('status') == 'off':
-			leds['status'] = False
-		ledUpdate()
+			ledstrip.status = False
+		ledstrip.update()
 	except:
 		pass
 	return app.send_static_file('newui.html')
@@ -118,15 +65,12 @@ def ui():
 def js():
 	return app.send_static_file('jscolor.js')
 
-
 @app.after_request
 def add_header(r):
 	r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, public, max-age=0"
 	r.headers["Pragma"] = "no-cache"
-	r.headers['Expires'] = '0'
+	r.headers['Expires'] = "0"
 	return r
-
-#app.add_url_rule("/", "index", lambda: 'Hello World!')
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0')
