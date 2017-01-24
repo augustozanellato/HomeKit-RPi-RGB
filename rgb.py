@@ -2,6 +2,7 @@
 
 from flask import Flask, request
 import ledutils
+
 app = Flask(__name__)
 
 app.config['CACHE_TYPE'] = "null"
@@ -26,7 +27,7 @@ def getBrightness():
 
 @app.route('/led/get/status')
 def getStatus():
-	return int(ledstrip.status)
+	return ledstrip.getStatus()
 
 @app.route('/led/off')
 def ledOff():

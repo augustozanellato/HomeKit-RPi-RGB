@@ -50,3 +50,6 @@ class RGBStrip:
 			self.pi.set_PWM_dutycycle(self.pins['red'], 0)
 			self.pi.set_PWM_dutycycle(self.pins['green'], 0)
 			self.pi.set_PWM_dutycycle(self.pins['blue'], 0)
+
+	def getStatus(self):
+		return str(int(self.status))
