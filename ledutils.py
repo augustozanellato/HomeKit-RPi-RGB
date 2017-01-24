@@ -19,7 +19,7 @@ class RGBStrip:
 		if self.status:
 			return str(int(max(self.color['red'], self.color['green'], self.color['blue']) / 255.0 * 100.0))
 		else:
-			return 0
+			return str(0)
 
 	def on(self):
 		self.status = True
@@ -36,7 +36,7 @@ class RGBStrip:
 		self.update()
 
 	def getColor(self):
-		return pack('BBB', *(self.color['red'], self.color['green'], self.color['blue'])).encode('hex')
+		return str(pack('BBB', *(self.color['red'], self.color['green'], self.color['blue'])).encode('hex'))
 
 	def setHEX(self, hexcolor):
 		self.setColor(*unpack('BBB', hexcolor.decode('hex')))
