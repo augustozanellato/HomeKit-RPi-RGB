@@ -1,6 +1,6 @@
 #Simple RGB LED Controller
 
-This example is a simple GPIO LED controller for the Raspberry Pi. It lets you choose a color through a Javascript powered Web-interface, yeah, I know its aesthetically awful, but hey, I'm a coder, not a designer :P
+This is a simple GPIO LED controller for the Raspberry Pi. It lets you choose a color through a Javascript powered Web-interface, yeah, I know its aesthetically awful, but hey, I'm a coder, not a designer :P
 
 ##Requirements
 
