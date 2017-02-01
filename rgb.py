@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 app.config['CACHE_TYPE'] = "null"
 
-ledstrip = ledutils.RGBStrip(10, 9, 11)
+ledstrip = ledutils.RGBLed(10, 9, 11)
 
 @app.route("/led/set/<color>")
 def setColor(color):
@@ -41,11 +41,24 @@ def ledOn():
 	ledstrip.update()
 	return getStatus()
 
+
+@app.route('/led/fade')
+def ledFade():
+	ledstrip.fade()
+	return 'ok'
+
+
+@app.route('/led/nofade')
+def ledStopFade():
+	ledstrip.noFade()
+	return 'ok'
+
 @app.route('/')
 def index():
-	return app.send_static_file('newui.html')
+	return app.send_static_file('ui.html')
 
-@app.route('/newui.html')
+
+@app.route('/ui.html')
 def ui():
 	try:
 		ledstrip.setHEX(str(request.args.get('color')))
@@ -59,7 +72,14 @@ def ui():
 		ledstrip.update()
 	except:
 		pass
-	return app.send_static_file('newui.html')
+	try:
+		if request.args.get('fade') == 'on':
+			ledstrip.fade()
+		elif request.args.get('fade') == 'off':
+			ledstrip.noFade()
+	except:
+		pass
+	return app.send_static_file('ui.html')
 
 @app.route('/jscolor.js')
 def js():

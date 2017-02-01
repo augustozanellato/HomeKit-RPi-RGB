@@ -1,7 +1,11 @@
 #!/usr/bin/env python2
 import pigpio
 from struct import pack, unpack
-class RGBStrip:
+from threading import Thread
+from time import sleep
+
+
+class RGBLed:
 	def __init__(self, rpin, gpin, bpin):
 		self.pi = pigpio.pi()
 		self.pins = {'red':   rpin,
@@ -14,7 +18,7 @@ class RGBStrip:
 		              'blue':       255,
 		              'brightness': 255}
 		self.status = False
-
+		self.stopFade = False
 	def getBrightness(self):
 		if self.status:
 			return str(int(max(self.color['red'], self.color['green'], self.color['blue']) / 255.0 * 100.0))
@@ -53,3 +57,30 @@ class RGBStrip:
 
 	def getStatus(self):
 		return str(int(self.status))
+
+	def fadeworker(self):
+		while True:
+			if self.status:
+				c = [255, 0, 0]
+				for decColor in range(3):
+					if decColor == 2:
+						incColor = 0
+					else:
+						incColor = decColor + 1
+					for _ in range(255):
+						c[decColor] -= 1
+						c[incColor] += 1
+						self.setColor(c[0], c[1], c[2])
+						if self.stopFade:
+							self.setHEX("000000")
+							self.stopFade = False
+							return
+						sleep(0.005)
+
+	def fade(self):
+		Thread(target=self.fadeworker).start()
+
+	def noFade(self):
+		self.stopFade = True
+		while self.stopFade:
+			sleep(0.000001)
